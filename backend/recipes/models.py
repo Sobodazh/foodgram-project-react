@@ -48,13 +48,14 @@ class Recipe(models.Model):
         User,
         related_name='recipes',
         on_delete=models.CASCADE,
-        null=True,
         verbose_name='Автор',
     )
     text = models.TextField('Описание')
     image = models.ImageField(
         'Изображение',
-        upload_to='recipes/'
+        upload_to='recipes/',
+        blank=True,
+        null=True
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления',
@@ -73,7 +74,6 @@ class Recipe(models.Model):
     )
 
     class Meta:
-        ordering = ['-id']
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
 
@@ -93,7 +93,7 @@ class IngredientInRecipe(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Ингредиент',
     )
-    amount = models.PositiveSmallIntegerField(
+    amount = models.PositiveIntegerField(
         'Количество',
         validators=[MinValueValidator(1, message='Минимальное количество'
                                       'не может быть меньше 1')]
@@ -110,7 +110,7 @@ class IngredientInRecipe(models.Model):
         )
 
 
-class Favourite(models.Model):
+class Favorite(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -128,11 +128,11 @@ class Favourite(models.Model):
         verbose_name = 'Избранное'
         constraints = [
             UniqueConstraint(fields=['user', 'recipe'],
-                             name='unique_favourite')
+                             name='unique_favorite')
         ]
 
     def __str__(self):
-        return f'{self.user} добавил "{self.recipe}" в Избранное'
+        return f'{self.user_id} добавил "{self.recipe_id}" в Избранное'
 
 
 class ShoppingCart(models.Model):
@@ -158,4 +158,4 @@ class ShoppingCart(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.user} добавил "{self.recipe}" в корзину'
+        return f'{self.user_id} добавил "{self.recipe_id}" в корзину'

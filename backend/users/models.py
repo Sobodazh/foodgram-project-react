@@ -5,12 +5,12 @@ from django.db.models import UniqueConstraint
 
 class User(AbstractUser):
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [
+    REQUIRED_FIELDS = (
         'username',
         'first_name',
         'last_name',
         'password'
-    ]
+    )
     email = models.EmailField(
         'Электронная почта',
         max_length=254,

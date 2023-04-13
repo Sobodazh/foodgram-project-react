@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-c=4xndjtu2kb++%5slww^6a+z(q$y#uf!r3)r&1im!g4)+ab&$'
 
 
-DEBUG = True
+DEBUG = os.getenv('DEBUG'),
 
 ALLOWED_HOSTS = ['*']
 
@@ -26,14 +26,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'users',
+    'recipes',
+    'api',
+
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
     'django_filters',
-
-    'users',
-    'recipes',
-    'api',
 ]
 
 MIDDLEWARE = [
@@ -133,10 +133,10 @@ USE_L10N = True
 USE_TZ = True
 
 
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
