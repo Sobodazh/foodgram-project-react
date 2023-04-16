@@ -146,8 +146,8 @@ class RecipeViewSet(ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def download_shopping_cart(self, request):
-        user = request.user
-        if not user.shopping_cart.exists():
+        current_user = request.user
+        if not current_user.shopping_cart.exists():
             return Response(status=HTTP_400_BAD_REQUEST)
 
         ingredients = IngredientInRecipe.objects.filter(
@@ -159,7 +159,7 @@ class RecipeViewSet(ModelViewSet):
 
         today = datetime.today()
         shopping_list = (
-            f'Список покупок для: {user.get_full_name()}\n'
+            f'Список покупок для: {current_user.get_full_name()}\n'
             f'Дата: {today:%Y-%m-%d}\n'
         )
         shopping_list += '\n'.join([
@@ -170,7 +170,7 @@ class RecipeViewSet(ModelViewSet):
         ])
         shopping_list += f'\n ({today:%Y})'
 
-        filename = f'{user.username}_shopping_list.txt'
+        filename = f'{current_user.username}_shopping_list.txt'
         response = HttpResponse(shopping_list, content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename={filename}'
 
