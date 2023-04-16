@@ -41,7 +41,7 @@ class CustomUserViewSet(UserViewSet):
         permission_classes=[IsAuthenticated]
     )
     def subscribe(self, request, **kwargs):
-        user = request.user
+        current_user = request.user
         author_id = self.kwargs.get('id')
         author = get_object_or_404(User, id=author_id)
 
@@ -50,12 +50,12 @@ class CustomUserViewSet(UserViewSet):
                                           data=request.data,
                                           context={"request": request})
             serializer.is_valid(raise_exception=True)
-            Follow.objects.create(user=user, author=author)
+            Follow.objects.create(user=current_user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         elif request.method == 'DELETE':
             subscription = get_object_or_404(Follow,
-                                             user=user,
+                                             user=current_user,
                                              author=author)
             subscription.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)

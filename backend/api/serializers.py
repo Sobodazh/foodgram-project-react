@@ -5,7 +5,8 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rest_framework.fields import IntegerField, SerializerMethodField
+from rest_framework.fields import (IntegerField, ReadOnlyField,
+                                   SerializerMethodField)
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer
 
@@ -42,10 +43,10 @@ class CustomUserSerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Follow.objects.filter(user=user, author=obj).exists()
+        current_user = self.context['request'].user
+        if current_user.is_authenticated:
+            return Follow.objects.filter(
+                user=current_user, author=obj).exists()
 
 
 class FollowSerializer(UserSerializer):
@@ -68,14 +69,14 @@ class FollowSerializer(UserSerializer):
         read_only_fields = ('email', 'username')
 
     def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return Follow.objects.filter(user=user, author=obj).exists()
+        current_user = self.context['request'].user
+        if current_user.is_authenticated:
+            return Follow.objects.filter(
+                user=current_user, author=obj).exists()
 
     def validate(self, data):
         author = self.instance
-        current_user = self.context.get('request').user
+        current_user = self.context['request'].user
         if Follow.objects.filter(author=author, user=current_user).exists():
             raise ValidationError(
                 detail=f'Вы уже подписаны на пользователя {current_user}',
@@ -153,31 +154,20 @@ class RecipeReadSerializer(ModelSerializer):
         return serializer.data
 
     def get_is_favorited(self, obj):
-        current_user = self.context.get('request').user
-        if current_user.is_anonymous:
-            return False
-        return current_user.favorites.filter(recipe=obj).exists()
+        current_user = self.context['request'].user
+        if current_user.is_authenticated:
+            return current_user.favorites.filter(recipe=obj).exists()
 
     def get_is_in_shopping_cart(self, obj):
-        current_user = self.context.get('request').user
-        if current_user.is_anonymous:
-            return False
-        return current_user.shopping_cart.filter(recipe=obj).exists()
+        current_user = self.context['request'].user
+        if current_user.is_authenticated:
+            return current_user.shopping_cart.filter(recipe=obj).exists()
 
 
 class IngredientInRecipeSerializer(ModelSerializer):
-    id = SerializerMethodField()
-    name = SerializerMethodField()
-    measurement_unit = SerializerMethodField()
-
-    def get_id(self, obj):
-        return obj.ingredient.id
-
-    def get_name(self, obj):
-        return obj.ingredient.name
-
-    def get_measurement_unit(self, obj):
-        return obj.ingredient.measurement_unit
+    id = ReadOnlyField(source='ingredient.id',)
+    name = ReadOnlyField(source='ingredient.name',)
+    measurement_unit = ReadOnlyField(source='ingredient.measurement_unit',)
 
     class Meta:
         model = IngredientInRecipe

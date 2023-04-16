@@ -7,7 +7,7 @@ User = get_user_model()
 
 
 class Ingredient(models.Model):
-    name = models.CharField('Название', max_length=200)
+    name = models.CharField('Название', max_length=200, unique=True)
     measurement_unit = models.CharField('Единица измерения', max_length=200)
 
     class Meta:
@@ -54,8 +54,6 @@ class Recipe(models.Model):
     image = models.ImageField(
         'Изображение',
         upload_to='recipes/',
-        blank=True,
-        null=True
     )
     cooking_time = models.PositiveSmallIntegerField(
         'Время приготовления',
@@ -126,6 +124,7 @@ class Favorite(models.Model):
 
     class Meta:
         verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
         constraints = [
             UniqueConstraint(fields=['user', 'recipe'],
                              name='unique_favorite')

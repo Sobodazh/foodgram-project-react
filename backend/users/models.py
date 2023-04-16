@@ -34,18 +34,18 @@ class Follow(models.Model):
     user = models.ForeignKey(
         User,
         related_name='follower',
-        verbose_name="Подписчик",
+        verbose_name='Подписчик',
         on_delete=models.CASCADE,
     )
     author = models.ForeignKey(
         User,
         related_name='following',
-        verbose_name="Подписки",
+        verbose_name='Подписки',
         on_delete=models.CASCADE,
     )
 
     class Meta:
-        ordering = ['-id']
+        ordering = ('-id',)
         constraints = [
             UniqueConstraint(fields=['user', 'author'],
                              name='unique_following')
